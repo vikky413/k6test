@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "search-term": "Cardiology",
+            "special":"Heart",
+             "type":"specialty"
+        },
+        {
+          "search-term": "Headache",
+          "special":"Medicine",
+           "type":"specialty"
+      }
+
+    ]
+  }
+  
