@@ -1,7 +1,16 @@
 import { sleep, group, check } from 'k6'
 import http from 'k6/http'
+import { SharedArray } from 'k6/data'
 import { vus,duration,homeurl ,searchurl} from './env_sunai.js'
+
 export const options = { 
+  ext: {
+    loadimpact: {
+      projectID: 3607882,
+      // Test runs with the same name groups test runs together
+      name: "Search All"
+    }
+  },
     vus: vus,
      duration: duration,
      thresholds: {
@@ -10,9 +19,17 @@ export const options = {
       },
      }
 
+     const data = new SharedArray('some data name', function () {
+      return JSON.parse(open('./data.json')).users;
+    });
+    
+ 
+
 export default function main() {
   let response
 
+  
+  
   group(`Page_1 - ${homeurl}`, function () {
     response = http.get(homeurl, {
       headers: {
@@ -51,9 +68,12 @@ export default function main() {
     })
     sleep(12.9)
   })
-
+  const user = data[0];
+  for(const getdata of data){
+    // console.log(getdata.query)
+  
   group(`Page_2 - ${searchurl}`, function () {
-    response = http.get(searchurl, {
+    response = http.get(`${searchurl}?query=${getdata.query}`, {
       headers: {
         'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
         'sec-ch-ua-mobile': '?0',
@@ -70,7 +90,8 @@ export default function main() {
       },
     })
     check(response,{
-        "find oprn status is ok 200": (r)=> r.status === 200,
+        "find open status is ok 200": (r)=> r.status === 200,
     })
   })
+}
 }

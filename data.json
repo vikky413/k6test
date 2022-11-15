@@ -1,14 +1,10 @@
 {
     "users": [
         {
-            "search-term": "Cardiology",
-            "special":"Heart",
-             "type":"specialty"
+            "query" : "cardiologist"
         },
         {
-          "search-term": "Headache",
-          "special":"Medicine",
-           "type":"specialty"
+          "query" : "heart+transplan"
       }
 
     ]

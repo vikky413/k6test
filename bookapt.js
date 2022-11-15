@@ -2,13 +2,24 @@ import { sleep, group, check } from 'k6'
 import http from 'k6/http'
 import { vus,duration,latestdoctor, selectdoctor } from './env_sunai.js'
 export const options = { 
+  ext: {
+    loadimpact: {
+      projectID: 3607882,
+      // Test runs with the same name groups test runs together
+      name: "Book Appointment"
+    }
+  },
      vus: vus,
      duration: duration,
      thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
-        http_req_duration: ['p(95)<2001'], // 95% of requests should be below 600ms
+        http_req_duration: ['p(95)<8001'], // 95% of requests should be below 600ms
       },
      }
+
+    //  const data = new SharedArray('some data name', function () {
+    //   return JSON.parse(open('./.json')).users;
+    // }); 
 
 export default function main() {
   let response

@@ -2,6 +2,13 @@ import { sleep, group,check } from 'k6';
 import http from 'k6/http';
 import { vus,duration, homeurl, locationurl } from './env_sunai.js';
 export const options = {
+  ext: {
+    loadimpact: {
+      projectID: 3607882,
+      // Test runs with the same name groups test runs together
+      name: "near locations"
+    }
+  },
      vus: vus, 
      duration: duration,
      thresholds: {

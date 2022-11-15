@@ -1,9 +1,17 @@
 import { sleep, group, check } from 'k6'
 import http from 'k6/http'
-import { vus,duration, homeurl } from './env_sunai'
+import { SharedArray } from 'k6/data'
+import { vus,duration, homeurl, latestdoctor, avaiableurl } from './env_sunai.js'
 
 
 export const options = { 
+  ext: {
+    loadimpact: {
+      projectID: 3607882,
+      // Test runs with the same name groups test runs together
+      name: "Availbale for APT"
+    }
+  },
     vus: vus,
     duration: duration,
     thresholds: {
@@ -11,6 +19,10 @@ export const options = {
         http_req_duration: ['p(95)<2001'], // 95% of requests should be below 2000ms
       },
  }
+
+ const data = new SharedArray('some data name', function () {
+  return JSON.parse(open('./aptData.json')).users;
+});
 
 export default function main() {
   let response
@@ -55,10 +67,10 @@ export default function main() {
   })
 
   group(
-    'page_2 - https://www.mountsinai.org/find-a-doctor/result?search-term=Primary%20Care&type=specialty',
+    `Page_2 : ${latestdoctor}`,
     function () {
       response = http.get(
-        'https://www.mountsinai.org/find-a-doctor/result?search-term=Primary%20Care&type=specialty',
+       latestdoctor,
         {
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
@@ -83,11 +95,16 @@ export default function main() {
     }
   )
 
+  const user = data[0];
+for(const getdata of data){
+ // console.log(getdata);
+
+
   group(
-    'page_3 - https://doctor.mountsinai.org/view-availability?doctor-name=andrew-petelin&pid=0000072500026903816771&officeId=0000072440085219651901&epicVisitId=2252',
+    `Page_3 : ${avaiableurl}`,
     function () {
       response = http.get(
-        'https://doctor.mountsinai.org/view-availability?doctor-name=andrew-petelin&pid=0000072500026903816771&officeId=0000072440085219651901&epicVisitId=2252',
+        `${avaiableurl}?doctor-name=${getdata.name}&pid=${getdata.pid}&officeId=${getdata.officeId}&epicVisitId=2252`,
         {
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
@@ -109,57 +126,58 @@ export default function main() {
         "appointment available  status is ok 200": (r)=> r.status === 200,
     })
       sleep(1)
-      response = http.get(
-        'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fmap_icon.svg&w=16&q=75',
-        {
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            'if-none-match': 'S3SCpZxTm9eq374QC78YT4gKEwIYEQDvxfp-S5biTOw=',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'no-cors',
-            'sec-fetch-dest': 'image',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-        }
-      )
-      response = http.get(
-        'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fprev_arrow_inactive.svg&w=32&q=75',
-        {
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            'if-none-match': '6XExblj8R+MYflIKjhDWy2fyf-YtYajF1ZTBbexido4=',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'no-cors',
-            'sec-fetch-dest': 'image',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-        }
-      )
-      response = http.get(
-        'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fnext_arrow.svg&w=32&q=75',
-        {
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            'if-none-match': '1QV3UNCYFSPSpGcjJbZaZGWFUULA2s07JxuJnnenhQI=',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'no-cors',
-            'sec-fetch-dest': 'image',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-        }
-      )
+      // response = http.get(
+      //   'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fmap_icon.svg&w=16&q=75',
+      //   {
+      //     headers: {
+      //       'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+      //       'if-none-match': 'S3SCpZxTm9eq374QC78YT4gKEwIYEQDvxfp-S5biTOw=',
+      //       'sec-ch-ua-mobile': '?0',
+      //       'sec-ch-ua-platform': '"Windows"',
+      //       accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      //       'sec-fetch-site': 'same-origin',
+      //       'sec-fetch-mode': 'no-cors',
+      //       'sec-fetch-dest': 'image',
+      //       'accept-encoding': 'gzip, deflate, br',
+      //       'accept-language': 'en-US,en;q=0.9',
+      //     },
+      //   }
+      // )
+      // response = http.get(
+      //   'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fprev_arrow_inactive.svg&w=32&q=75',
+      //   {
+      //     headers: {
+      //       'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+      //       'if-none-match': '6XExblj8R+MYflIKjhDWy2fyf-YtYajF1ZTBbexido4=',
+      //       'sec-ch-ua-mobile': '?0',
+      //       'sec-ch-ua-platform': '"Windows"',
+      //       accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      //       'sec-fetch-site': 'same-origin',
+      //       'sec-fetch-mode': 'no-cors',
+      //       'sec-fetch-dest': 'image',
+      //       'accept-encoding': 'gzip, deflate, br',
+      //       'accept-language': 'en-US,en;q=0.9',
+      //     },
+      //   }
+      // )
+      // response = http.get(
+      //   'https://doctor.mountsinai.org/_next/image?url=%2Fassets%2Fnext_arrow.svg&w=32&q=75',
+      //   {
+      //     headers: {
+      //       'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+      //       'if-none-match': '1QV3UNCYFSPSpGcjJbZaZGWFUULA2s07JxuJnnenhQI=',
+      //       'sec-ch-ua-mobile': '?0',
+      //       'sec-ch-ua-platform': '"Windows"',
+      //       accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      //       'sec-fetch-site': 'same-origin',
+      //       'sec-fetch-mode': 'no-cors',
+      //       'sec-fetch-dest': 'image',
+      //       'accept-encoding': 'gzip, deflate, br',
+      //       'accept-language': 'en-US,en;q=0.9',
+      //     },
+      //   }
+      // )
     }
   )
+}
 }
