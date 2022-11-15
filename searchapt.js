@@ -29,6 +29,9 @@ export default function main() {
 
   group(`Page_1 - ${homeurl}`, function () {
     response = http.get(homeurl, {
+      tags : {
+        my_tag: "Home tag",
+      },
       headers: {
         'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
         'sec-ch-ua-mobile': '?0',
@@ -72,6 +75,9 @@ export default function main() {
       response = http.get(
        latestdoctor,
         {
+          tags : {
+            my_tag: "latest doctors tag",
+          },
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
             'sec-ch-ua-mobile': '?0',
@@ -106,6 +112,9 @@ for(const getdata of data){
       response = http.get(
         `${avaiableurl}?doctor-name=${getdata.name}&pid=${getdata.pid}&officeId=${getdata.officeId}&epicVisitId=2252`,
         {
+          tags : {
+            my_tag: "Available doctor tag",
+          },
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
             'sec-ch-ua-mobile': '?0',

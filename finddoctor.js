@@ -30,6 +30,9 @@ export default function main() {
   // This is homepage of MountSinai 
   group(`Page_1 - ${homeurl}`, function () {
     response = http.get(homeurl, {
+        tags : {
+            my_tag: "Home tag",
+          },
       headers: {
         'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
         'sec-ch-ua-mobile': '?0',
@@ -53,6 +56,7 @@ export default function main() {
 
   group('page_2 - https://www.mountsinai.org/find-a-doctor', function () {
     response = http.get('https://www.mountsinai.org/find-a-doctor', {
+
       headers: {
         'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
         'sec-ch-ua-mobile': '?0',
@@ -67,6 +71,9 @@ export default function main() {
         'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'en-US,en;q=0.9',
       },
+      tags : {
+        my_tag: "Find a doctor tag"
+      }
     })
     check(response,{
         "find doctor status is ok 200": (r)=> r.status === 200,
@@ -85,6 +92,9 @@ export default function main() {
         'sec-fetch-dest': 'iframe',
         'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'en-US,en;q=0.9',
+      },
+      tags : {
+        my_tag: "doctor tag",
       },
     })
     sleep(5.1)
@@ -133,6 +143,9 @@ export default function main() {
         'sec-fetch-dest': 'document',
         'accept-encoding': 'gzip, deflate, br',
         'accept-language': 'en-US,en;q=0.9',
+      },
+      tags : {
+        my_tag: "Doctors name tag"
       },
     })
     check(response,{

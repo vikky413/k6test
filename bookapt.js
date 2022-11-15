@@ -29,9 +29,10 @@ export default function main() {
   group(
     `Page_1 : ${latestdoctor}`,
     function () {
-      response = http.get(
-        latestdoctor,
-        {
+      response = http.get(latestdoctor,{
+          tags : {
+            my_tag: "Home tag",
+          },
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
             'sec-ch-ua-mobile': '?0',
@@ -62,6 +63,9 @@ export default function main() {
       response = http.get(
         selectdoctor,
         {
+          tags : {
+            my_tag: "select doctor tag"
+          },
           headers: {
             'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
             'sec-ch-ua-mobile': '?0',
@@ -106,6 +110,9 @@ export default function main() {
             'sec-fetch-dest': 'empty',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'en-US,en;q=0.9',
+          },
+          tags : {
+            my_tag: "details tag"
           },
         }
       )
