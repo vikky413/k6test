@@ -9,8 +9,8 @@ export const options = {
       name: "Book Appointment"
     }
   },
-     vus: vus,
-     duration: duration,
+     vus: 10,
+     duration: '1m',
      thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
         http_req_duration: ['p(95)<8001'], // 95% of requests should be below 600ms
@@ -23,7 +23,8 @@ export const options = {
 
 export default function main() {
   let response
- 
+ const latestdoctor = 'https://www.mountsinai.org/find-a-doctor/result?search-term=Primary%20Care&type=specialty';
+  const selectdoctor = 'https://doctor.mountsinai.org/schedule-appointment?pid=0000072500001497174922&officeId=0000072440074827831371&epicVisitId=2252&timeslot=2022-11-12T11:00:00';
 
   // Availble Doctor in latest Days 
   group(
