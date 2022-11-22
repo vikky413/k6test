@@ -1,125 +1,98 @@
-import { sleep, group, check } from 'k6'
+import { sleep, group,check } from 'k6'
 import http from 'k6/http'
-import { vus,duration,latestdoctor, selectdoctor } from './env_sunai.js'
-export const options = { 
-  ext: {
-    loadimpact: {
-      projectID: 3607882,
-      // Test runs with the same name groups test runs together
-      name: "Book Appointment"
-    }
-  },
-     vus: vus,
-     duration: duration,
-     thresholds: {
-        http_req_failed: ['rate<0.01'], // http errors should be less than 1%
-        http_req_duration: ['p(95)<8001'], // 95% of requests should be below 600ms
-      },
-     }
 
-    //  const data = new SharedArray('some data name', function () {
-    //   return JSON.parse(open('./.json')).users;
-    // }); 
+export const options = {
+   vus: 10, 
+  duration: '2m',
+  thresholds: {
+  http_req_failed: ['rate<0.01'], // http errors should be less than 1%
+  http_req_duration: ['p(95)<20001'], // 95% of requests should be below 20000ms
+},
+}
 
 export default function main() {
   let response
- 
 
-  // Availble Doctor in latest Days 
-  group(
-    `Page_1 : ${latestdoctor}`,
-    function () {
-      response = http.get(latestdoctor,{
-          tags : {
-            my_tag: "Home tag",
-          },
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'upgrade-insecure-requests': '1',
-            accept:
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-user': '?1',
-            'sec-fetch-dest': 'document',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-        }
-      )
-      check(response,{
-        "find a doctor status is ok 200": (r)=> r.status === 200,
+  group('page_2 - https://www.mountsinai.org/appointment', function () {
+    response = http.get('https://www.mountsinai.org/appointment', {
+      headers: {
+        'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'upgrade-insecure-requests': '1',
+        accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-user': '?1',
+        'sec-fetch-dest': 'document',
+        'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'en-US,en;q=0.9',
+      },
     })
-      sleep(14.5)
-    }
-  )
+    check(response,{
+      "find doctor status is ok 200": (r)=> r.status === 200,
+  })
+    sleep(98.5)
+  })
 
-  // Select Any Availble Apointment 
-  group(
-    `Page_2 ${selectdoctor}`,
-    function () {
-      response = http.get(
-        selectdoctor,
-        {
-          tags : {
-            my_tag: "select doctor tag"
-          },
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            'upgrade-insecure-requests': '1',
-            accept:
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-user': '?1',
-            'sec-fetch-dest': 'document',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-        }
-      )
-      check(response,{
-        "get schedule appointment status is ok 200": (r)=> r.status === 200,
-    })
-      
-    }
-  )
-
-   // Post the details about you for book apointment with availble slot
-
-  group(
-    'page_4 - https://doctor.mountsinai.org/schedule-appointment?pid=0000072500001497174922&officeId=0000072440074827831371&epicVisitId=2252&timeslot=2022-11-12T11%3A00%3A00',
-    function () {
-      response = http.post(
-        'https://doctor.mountsinai.org/api/graphql/apollo/fad/results',
-        '{"operationName":"Submit","variables":{"formData":{"patient":{"firstName":"sjbdbf","lastName":"rge","dob":"2009-02-03","gender":"male","address":{"street":"k-sector","city":" Birmingham","state":"Alabama","zipCode":"35242","email":"realvk4n@gmail.com","phones":[{"type":"Home Phone","number":"(834) 773-4677"}]}},"appointment":{"departmentId":"8349002","departmentIdType":"External","visitTypeId":"2252","visitTypeIdType":"External","providerId":"1659605186","providerIdType":"NPI","date":"2022-11-12","time":"11:00:00","reasonForVisit":"[\\"Hepatitis A Vaccine\\",\\"GERD\\",\\"General Consultation\\"]","referringProviderName":"","insurance":{"insuranceName":"EmblemHealth - HIP-Medicare","memberNumber":"","groupNumber":""}}}},"query":"mutation Submit($formData: FormData!) {\\n  submit(formData: $formData) {\\n    httpStatus\\n    message\\n    __typename\\n  }\\n  session(formData: $formData) {\\n    httpStatus\\n    message\\n    sessionId\\n    viewId\\n    objectId\\n    __typename\\n  }\\n}\\n"}',
-        {
-          headers: {
-            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
-            accept: '*/*',
-            'content-type': 'application/json',
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '"Windows"',
-            origin: 'https://doctor.mountsinai.org',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-dest': 'empty',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'en-US,en;q=0.9',
-          },
-          tags : {
-            my_tag: "details tag"
-          },
-        }
-      )
-      check(response,{
-        "post appointment details status is ok 200": (r)=> r.status === 200,
-    })
-    }
-
-  )
+  group('page_4 - https://raa.mountsinai.org/makeappt/procApptReq.cfm', function () {
+    response = http.post(
+      'https://raa.mountsinai.org/makeappt/procApptReq.cfm',
+      {
+        REASONFORVISIT: '',
+        SPECIALIZATION: 'Ear, Nose, Throat (Otolaryngology)',
+        additional_info: '',
+        campaign: '',
+        channel_source: '',
+        country: 'n/a',
+        dept: '',
+        div: '',
+        dob: '01/05/2000',
+        email: 'realvk4n@gmail.com',
+        existing_patient: 'N',
+        firstname: 'rakesh',
+        gender: 'M',
+        input_addr1: '2334, nelco test',
+        input_addr2: '',
+        input_city: 'Albnay',
+        input_state: 'NY',
+        input_zip: '10023',
+        ins_primary: 'N/A',
+        isSpecialty: 'true',
+        lastname: 'singh',
+        location_utm: '',
+        oid: 'MSH00100OOO00000000020',
+        ou_id: '',
+        phone_primary: '9845683896',
+        pid: 'MSH00000DDD00000000020',
+        pref_comm_time: 'Afternoon (12pm-5pm)',
+        pref_language: 'English',
+        request_type: 'spec',
+        requestor_rel: 'n/a',
+        service_area: '',
+      },
+      {
+        headers: {
+          'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+          'sec-ch-ua-mobile': '?0',
+          'sec-ch-ua-platform': '"Windows"',
+          'upgrade-insecure-requests': '1',
+          origin: 'https://raa.mountsinai.org',
+          'content-type': 'application/x-www-form-urlencoded',
+          accept:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'sec-fetch-site': 'same-origin',
+          'sec-fetch-mode': 'navigate',
+          'sec-fetch-user': '?1',
+          'sec-fetch-dest': 'document',
+          'accept-encoding': 'gzip, deflate, br',
+          'accept-language': 'en-US,en;q=0.9',
+        },
+      }
+    )
+    check(response,{
+      "find doctor status is ok 200": (r)=> r.status === 200,
+  })
+  })
 }
