@@ -21,7 +21,7 @@ export const options = {
  }
 
  const data = new SharedArray('some data name', function () {
-  return JSON.parse(open('./aptData.json')).users;
+  return JSON.parse(open('./SearchAptData.json')).users;
 });
 
 export default function main() {

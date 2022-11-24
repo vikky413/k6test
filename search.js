@@ -20,7 +20,7 @@ export const options = {
      }
 
      const data = new SharedArray('some data name', function () {
-      return JSON.parse(open('./data.json')).users;
+      return JSON.parse(open('./searchData.json')).users;
     });
     
  
